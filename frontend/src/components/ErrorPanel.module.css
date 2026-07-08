@@ -1,0 +1,32 @@
+.panel {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  border: 1px solid var(--error);
+  background: rgba(255, 92, 92, 0.06);
+  padding: 16px 18px;
+}
+
+.dot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--error);
+  margin-top: 5px;
+  box-shadow: 0 0 8px rgba(255, 92, 92, 0.6);
+}
+
+.title {
+  margin: 0 0 4px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text);
+}
+
+.message {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}

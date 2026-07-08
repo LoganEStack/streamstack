@@ -1,0 +1,91 @@
+.panel {
+  border: 1px solid var(--hairline);
+  background: var(--panel);
+  padding: 16px 20px 20px;
+  margin-top: 16px;
+}
+
+.eyebrow {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 12px;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 6px 0;
+  border-top: 1px solid var(--hairline);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.row:first-of-type {
+  border-top: none;
+}
+
+.rowLabel {
+  color: var(--text-dim);
+  flex-shrink: 0;
+}
+
+.rowValue {
+  color: var(--text);
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.manifestButton {
+  width: 100%;
+  margin-top: 14px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  background: none;
+  border: 1px solid var(--hairline);
+  color: var(--text-dim);
+  padding: 8px;
+  cursor: pointer;
+}
+
+.manifestButton:hover {
+  border-color: var(--signal-dim);
+  color: var(--signal);
+}
+
+.manifestBox {
+  margin-top: 10px;
+}
+
+.manifestStatus {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  margin: 0;
+}
+
+.manifestError {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--error);
+  margin: 0;
+}
+
+.manifestText {
+  max-height: 240px;
+  overflow: auto;
+  background: var(--bg);
+  border: 1px solid var(--hairline);
+  padding: 12px;
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--text-dim);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

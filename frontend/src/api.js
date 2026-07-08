@@ -21,6 +21,14 @@ export function masterPlaylistUrl(publicId) {
   return `${API_BASE}/media/${publicId}/master.m3u8`;
 }
 
+export async function fetchMasterManifestText(publicId) {
+  const res = await fetch(masterPlaylistUrl(publicId));
+  if (!res.ok) {
+    throw new Error(`Failed to fetch manifest: ${res.status}`);
+  }
+  return res.text();
+}
+
 export function renditionPlaylistUrl(publicId, rendition) {
   return `${API_BASE}/media/${publicId}/${rendition}/index.m3u8`;
 }

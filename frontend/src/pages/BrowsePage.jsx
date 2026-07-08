@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { listVideos } from '../api';
 import VideoCard from '../components/VideoCard';
+import { SkeletonGrid } from '../components/Skeleton';
+import ErrorPanel from '../components/ErrorPanel';
 import styles from './BrowsePage.module.css';
 
 export default function BrowsePage() {
@@ -18,9 +20,14 @@ export default function BrowsePage() {
       <p className="eyebrow">Catalog</p>
       <h1 className={styles.heading}>Browse</h1>
 
-      {error && <p className={styles.error}>Could not reach the backend: {error}</p>}
+      {error && (
+        <ErrorPanel
+          title="Could not reach the backend"
+          message={`${error} — is the FastAPI server running on localhost:8000?`}
+        />
+      )}
 
-      {!error && !videos && <p className={styles.status}>Loading catalog…</p>}
+      {!error && !videos && <SkeletonGrid count={4} />}
 
       {videos && videos.length === 0 && (
         <p className={styles.status}>No videos in the catalog yet.</p>

@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Hls from 'hls.js';
-import { getVideo, masterPlaylistUrl, renditionPlaylistUrl } from '../api';
+import { getVideo, masterPlaylistUrl, renditionPlaylistUrl, fetchMasterManifestText } from '../api';
 import RenditionMeter from '../components/RenditionMeter';
+import StreamInspector from '../components/StreamInspector';
+import ErrorPanel from '../components/ErrorPanel';
 import styles from './WatchPage.module.css';
 
 // Maps a level's vertical resolution to the label used in RenditionMeter
@@ -18,11 +20,17 @@ export default function WatchPage() {
   const videoRef = useRef(null);
   const hlsRef = useRef(null);
   const nativeHlsRef = useRef(false);
+  const currentFragRef = useRef(null); // { name, start, duration } — read inside the timeupdate loop
+
   const [video, setVideo] = useState(null);
   const [error, setError] = useState(null);
   const [activeRendition, setActiveRendition] = useState(null);
   const [availableRenditions, setAvailableRenditions] = useState([]);
   const [isAuto, setIsAuto] = useState(true);
+
+  const [currentSegment, setCurrentSegment] = useState(null); // { name } — for display
+  const [timeRemaining, setTimeRemaining] = useState(null);
+  const [lastReceived, setLastReceived] = useState(null); // { name, receivedAt }
 
   useEffect(() => {
     getVideo(publicId)
@@ -35,12 +43,20 @@ export default function WatchPage() {
     const src = masterPlaylistUrl(publicId);
     const el = videoRef.current;
 
+    function handleTimeUpdate() {
+      const frag = currentFragRef.current;
+      if (!frag) return;
+      const remaining = frag.duration - (el.currentTime - frag.start);
+      setTimeRemaining(Math.max(0, remaining));
+    }
+
     if (Hls.isSupported()) {
       nativeHlsRef.current = false;
       const hls = new Hls();
       hlsRef.current = hls;
       hls.loadSource(src);
       hls.attachMedia(el);
+      el.addEventListener('timeupdate', handleTimeUpdate);
 
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
         const labels = [...new Set(hls.levels.map((level) => labelForHeight(level.height)))];
@@ -54,15 +70,34 @@ export default function WatchPage() {
         if (level) setActiveRendition(labelForHeight(level.height));
       });
 
+      // Fires once a segment finishes downloading — this is the "received" moment.
+      hls.on(Hls.Events.FRAG_LOADED, (_event, data) => {
+        setLastReceived({ name: data.frag.relurl, receivedAt: Date.now() });
+      });
+
+      // Fires when playback position enters a new segment — this is "now playing".
+      hls.on(Hls.Events.FRAG_CHANGED, (_event, data) => {
+        const frag = data.frag;
+        currentFragRef.current = { name: frag.relurl, start: frag.start, duration: frag.duration };
+        setCurrentSegment({ name: frag.relurl });
+      });
+
       return () => {
         hls.destroy();
         hlsRef.current = null;
+        el.removeEventListener('timeupdate', handleTimeUpdate);
+        currentFragRef.current = null;
         setAvailableRenditions([]);
+        setCurrentSegment(null);
+        setTimeRemaining(null);
+        setLastReceived(null);
       };
     }
 
     if (el.canPlayType('application/vnd.apple.mpegurl')) {
       // Native Safari playback: request a specific rendition by loading its playlist.
+      // Safari's built-in HLS engine doesn't expose per-segment events the way
+      // HLS.js does, so the segment feed panel stays empty on this path.
       nativeHlsRef.current = true;
       setAvailableRenditions(['1080', '720', '480', '360']);
       el.src = src;
@@ -111,11 +146,15 @@ export default function WatchPage() {
     setIsAuto(true);
   }
 
+  function handleReadManifest() {
+    return fetchMasterManifestText(publicId);
+  }
+
   if (error) {
     return (
       <div className={`container ${styles.page}`}>
-        <p className={styles.error}>Could not load this video: {error}</p>
         <Link to="/" className={styles.back}>← Back to browse</Link>
+        <ErrorPanel title="Could not load this video" message={error} />
       </div>
     );
   }
@@ -123,7 +162,11 @@ export default function WatchPage() {
   if (!video) {
     return (
       <div className={`container ${styles.page}`}>
-        <p className={styles.status}>Loading…</p>
+        <Link to="/" className={styles.back}>← Back to browse</Link>
+        <div className={styles.layout}>
+          <div className={styles.videoSkeleton} />
+          <div className={styles.sidebarSkeleton} />
+        </div>
       </div>
     );
   }
@@ -164,6 +207,13 @@ export default function WatchPage() {
             />
             <p className={styles.hint}>Click a quality to request that rendition.</p>
           </div>
+
+          <StreamInspector
+            currentSegment={currentSegment}
+            timeRemaining={timeRemaining}
+            lastReceived={lastReceived}
+            onReadManifest={handleReadManifest}
+          />
         </aside>
       </div>
     </div>

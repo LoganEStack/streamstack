@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Hls from 'hls.js';
 import { uploadVideo, getJobStatus, uploadMasterPlaylistUrl } from '../api';
+import ErrorPanel from '../components/ErrorPanel';
 import styles from './UploadPage.module.css';
 
 const STATUS_COPY = {
@@ -86,7 +87,7 @@ export default function UploadPage() {
         </button>
       </form>
 
-      {error && <p className={styles.error}>{error}</p>}
+      {error && <ErrorPanel title="Upload failed" message={error} />}
 
       {job && (
         <div className={styles.jobPanel}>
