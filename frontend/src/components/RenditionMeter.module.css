@@ -1,0 +1,86 @@
+.meter {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  height: 64px;
+}
+
+.compact {
+  height: 28px;
+  gap: 5px;
+}
+
+.rung {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 26px;
+}
+
+.rungButton {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.rungButton:not(:disabled):hover .fill {
+  opacity: 0.85;
+}
+
+.rungButton:not(:disabled):hover .label {
+  color: var(--signal);
+}
+
+.rungButton:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.activeRung .track {
+  border-color: var(--signal-dim);
+}
+
+.compact .rung {
+  width: 8px;
+  gap: 0;
+}
+
+.track {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  background: var(--panel-raised);
+  border: 1px solid var(--hairline);
+  min-height: 0;
+}
+
+.fill {
+  width: 100%;
+  background: var(--signal-dim);
+  opacity: 0.55;
+  transition: opacity 0.2s ease, background 0.2s ease;
+}
+
+.activeFill {
+  background: linear-gradient(to top, var(--signal), #ffd27a);
+  opacity: 1;
+  box-shadow: 0 0 10px rgba(255, 176, 32, 0.5);
+}
+
+.unavailableFill {
+  opacity: 0.2;
+}
+
+.label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.activeLabel {
+  color: var(--signal);
+}

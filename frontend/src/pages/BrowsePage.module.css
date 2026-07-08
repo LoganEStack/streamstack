@@ -1,0 +1,27 @@
+.page {
+  padding: 48px 24px 80px;
+}
+
+.heading {
+  font-family: var(--font-mono);
+  font-size: 32px;
+  margin: 4px 0 32px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.status {
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.error {
+  color: var(--error);
+  font-family: var(--font-mono);
+  font-size: 13px;
+}

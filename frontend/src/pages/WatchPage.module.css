@@ -1,0 +1,121 @@
+.page {
+  padding: 32px 24px 80px;
+}
+
+.back {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-dim);
+  text-decoration: none;
+  display: inline-block;
+  margin-bottom: 20px;
+}
+
+.back:hover {
+  color: var(--signal);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 24px;
+}
+
+@media (max-width: 720px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.video {
+  width: 100%;
+  background: black;
+  border: 1px solid var(--hairline);
+  aspect-ratio: 16 / 9;
+}
+
+.sidebar {
+  border: 1px solid var(--hairline);
+  background: var(--panel);
+  padding: 20px;
+}
+
+.title {
+  font-family: var(--font-mono);
+  font-size: 20px;
+  margin: 6px 0 12px;
+}
+
+.description {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-dim);
+  margin: 0 0 24px;
+}
+
+.meterBlock {
+  border-top: 1px solid var(--hairline);
+  padding-top: 16px;
+}
+
+.meterHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.meterLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.activeTag {
+  color: var(--signal);
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.autoButton {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  background: none;
+  border: 1px solid var(--hairline);
+  color: var(--text-dim);
+  padding: 3px 8px;
+  cursor: pointer;
+}
+
+.autoButton:not(:disabled):hover {
+  border-color: var(--signal-dim);
+  color: var(--signal);
+}
+
+.autoButton:disabled {
+  color: var(--signal);
+  border-color: var(--signal-dim);
+  cursor: default;
+}
+
+.hint {
+  margin: 10px 0 0;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.status, .error {
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.error {
+  color: var(--error);
+}
+
+.status {
+  color: var(--text-dim);
+}

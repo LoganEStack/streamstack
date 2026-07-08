@@ -4,6 +4,7 @@ from app.media import router as media_router
 from app.browse import router as browse_router
 from app.video_detail import router as video_detail_router
 from app.database import create_db_and_tables
+from app.uploads import router as upload_router
 
 app = FastAPI(title="Streaming Backend")
 
@@ -23,6 +24,7 @@ def on_startup():
 app.include_router(media_router)            # /media/...
 app.include_router(browse_router)           # /browse
 app.include_router(video_detail_router)     # /v/{video_public_id}
+app.include_router(upload_router)           # /uploads/...
 
 @app.get("/")
 def root():

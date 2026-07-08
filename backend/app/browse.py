@@ -8,4 +8,6 @@ router = APIRouter(prefix="/browse", tags=["browse"])
 
 @router.get("", response_model=list[VideoPublic])
 def list_videos(session: Session = Depends(get_session)):
+    '''Returns a list of all videos.'''
+
     return session.exec(select(Video)).all()
