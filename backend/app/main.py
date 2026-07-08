@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.auth import router as auth_router
 from app.media import router as media_router
 from app.browse import router as browse_router
 from app.video_detail import router as video_detail_router
@@ -21,7 +20,6 @@ def on_startup():
     create_db_and_tables()
 
 
-app.include_router(auth_router)             # /auth/register, /auth/login
 app.include_router(media_router)            # /media/...
 app.include_router(browse_router)           # /browse
 app.include_router(video_detail_router)     # /v/{video_public_id}
