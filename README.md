@@ -168,7 +168,6 @@ Runs on `http://localhost:5173` (Vite's default).
 - Scheduled cleanup sweep (APScheduler) is designed but not yet wired in —
   currently relying on lazy (on-access) expiry only. Planned for the deploy
   step.
-- Thumbnails are generated placeholders, not real video frames.
 - Manual quality selection and the live segment inspector only work with
   HLS.js (Chrome, Firefox, Edge). Safari's native HLS engine doesn't expose
   the same per-segment/per-level events, so those two features degrade to

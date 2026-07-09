@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Hls from 'hls.js';
-import { renditionPlaylistUrl, fetchMasterManifestText } from '../api';
+import { renditionPlaylistUrl } from '../api';
 import RenditionMeter from '../components/RenditionMeter';
 import StreamInspector from '../components/StreamInspector';
-import ErrorPanel from '../components/ErrorPanel';
 import styles from './WatchPage.module.css';
 
 function labelForHeight(height) {
