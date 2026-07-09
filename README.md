@@ -2,6 +2,8 @@
 
 A small streaming app that serves videos using FFmpeg and the HLS protocol.
 
+![Browse page](readme-assets/browse-demo.png)
+
 
 ## What it does
 
@@ -14,6 +16,7 @@ A small streaming app that serves videos using FFmpeg and the HLS protocol.
   used to build the catalog, transcodes in the background, and is served back 
   with a 4 stage rendition ladder.
 
+![Watch page](readme-assets/watch-demo.png)
 
 ## Why it's built this way
 
