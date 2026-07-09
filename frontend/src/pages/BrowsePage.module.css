@@ -5,7 +5,14 @@
 .heading {
   font-family: var(--font-mono);
   font-size: 32px;
-  margin: 4px 0 32px;
+  margin: 6px 0 16;
+}
+
+.blurb {
+  color: var(--text-dim);
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0 0 32px;
 }
 
 .grid {

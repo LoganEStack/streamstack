@@ -7,7 +7,7 @@ export default function Nav() {
       <div className={styles.inner}>
         <NavLink to="/" className={styles.wordmark}>
           <span className={styles.dot} />
-          STREAMSTACK
+          STREAM STACK
         </NavLink>
         <nav className={styles.links}>
           <NavLink

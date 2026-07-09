@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:8000';
+const API_BASE = import.meta.env.VITE_API_BASE;
 
 async function request(path, options = {}) {
   const res = await fetch(`${API_BASE}${path}`, options);
@@ -26,6 +26,12 @@ export async function fetchMasterManifestText(publicId) {
   if (!res.ok) {
     throw new Error(`Failed to fetch manifest: ${res.status}`);
   }
+  return res.text();
+}
+
+export async function fetchUploadManifestText(token) {
+  const res = await fetch(`${API_BASE}/uploads/${token}/master.m3u8`);
+  if (!res.ok) throw new Error(`Failed to fetch manifest: ${res.status}`);
   return res.text();
 }
 

@@ -17,9 +17,10 @@ export default function BrowsePage() {
 
   return (
     <div className={`container ${styles.page}`}>
-      <p className="eyebrow">Catalog</p>
       <h1 className={styles.heading}>Browse</h1>
-
+      <p className={styles.blurb}>
+        A catalog of sample videos, ready to be streamed.
+      </p>
       {error && (
         <ErrorPanel
           title="Could not reach the backend"

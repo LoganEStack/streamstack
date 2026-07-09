@@ -72,9 +72,11 @@ export default function StreamInspector({
         </span>
       </div>
 
-      <button type="button" className={styles.manifestButton} onClick={handleReadManifest}>
-        {manifestOpen ? 'Hide master manifest' : 'Read master manifest'}
-      </button>
+      {onReadManifest && (
+        <button type="button" className={styles.manifestButton} onClick={handleReadManifest}>
+          {manifestOpen ? 'Hide master manifest' : 'Read master manifest'}
+        </button>
+      )}
 
       {manifestOpen && (
         <div className={styles.manifestBox}>

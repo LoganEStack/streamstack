@@ -6,22 +6,35 @@ from app.models import UploadJob, JobStatus
 
 
 def build_ffmpeg_command(renditions: list[dict], source_path: Path, output_dir: Path) -> list[str]:
-    """
-    Builds an FFmpeg command that produces a video rendition for each element in renditions.
-    """
-
     cmd = ["ffmpeg", "-y", "-i", str(source_path)]
+
+    # Probe for audio stream existence before building the command
+    probe = subprocess.run(
+        ["ffprobe", "-v", "quiet", "-select_streams", "a:0",
+         "-show_entries", "stream=codec_type", "-of", "csv=p=0", str(source_path)],
+        capture_output=True, text=True
+    )
+    has_audio = probe.stdout.strip() == "audio"
 
     var_stream_map = []
     for i, rung in enumerate(renditions):
+        cmd += ["-map", "0:v:0"]
+        if has_audio:
+            cmd += ["-map", "0:a:0"]
+
         cmd += [
-            "-map", "0:v:0", "-map", "0:a:0",
             f"-filter:v:{i}", f"scale=w={rung['width']}:h={rung['height']}",
             f"-b:v:{i}", rung["bitrate"],
             f"-c:v:{i}", "libx264",
-            f"-c:a:{i}", "aac",
         ]
-        var_stream_map.append(f"v:{i},a:{i},name:{rung['name']}")
+
+        if has_audio:
+            cmd += [f"-c:a:{i}", "aac"]
+
+        stream_map = f"v:{i},name:{rung['name']}"
+        if has_audio:
+            stream_map = f"v:{i},a:{i},name:{rung['name']}"
+        var_stream_map.append(stream_map)
 
     cmd += [
         "-f", "hls",

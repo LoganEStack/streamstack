@@ -6,7 +6,12 @@ import styles from './VideoCard.module.css';
 export default function VideoCard({ video }) {
   return (
     <Link to={`/v/${video.public_id}`} className={styles.card}>
-      <Thumbnail title={video.title} />
+      {/* <Thumbnail title={video.title} /> */}
+      <img
+        src={video.thumbnail_url}
+        alt={video.title}
+        className={styles.thumbnail}
+      />
       <div className={styles.top}>
         <RenditionMeter compact />
         <span className={styles.eyebrow}>HLS · 4 renditions</span>

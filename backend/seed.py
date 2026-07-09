@@ -8,15 +8,39 @@ video_data = [
     {
         "media_slug": "big-buck-bunny",
         "title": "Big Buck Bunny",
-        "description": "A giant rabbit deals with three bullying rodents, until he decides to strike back.",
-        "thumbnail_url": "/thumbnails/bbb.jpg",
+        "description": "A classic in video streaming.",
+        "thumbnail_url": "/uploads/big-buck-bunny/big-buck-bunny-thumbnail.jpg",
     },
     {
-        "media_slug": "sample-2",
-        "title": "Sample Video 2",
-        "description": "Placeholder second catalog entry for testing multi-title playback.",
-        "thumbnail_url": "/thumbnails/sample2.jpg",
+        "media_slug": "aerial-field-view",
+        "title": "Aerial Field View",
+        "description": "Aerial view of lush green agriculture fields in a rural countryside setting.",
+        "thumbnail_url": "/uploads/aerial-field-view/aerial-field-view-thumbnail.jpg",
     },
+    {
+        "media_slug": "aerial-waves",
+        "title": "Aerial Waves",
+        "description": "Aerial view of deep blue waves smashing against a rock formation.",
+        "thumbnail_url": "/uploads/aerial-waves/aerial-waves-thumbnail.jpg",
+    },
+    {
+        "media_slug": "globe",
+        "title": "Globe",
+        "description": "A rendering of planet Earth rotating on its axis.",
+        "thumbnail_url": "/uploads/globe/globe-thumbnail.jpg",
+    },
+    {
+        "media_slug": "scientist",
+        "title": "Scientist",
+        "description": "A scientist shakes a beaker of bright green liquid.",
+        "thumbnail_url": "/uploads/scientist/scientist-thumbnail.jpg",
+    },
+    {
+        "media_slug": "wild-goat-grazing",
+        "title": "Wild Goat Grazing",
+        "description": "A wild goat grazing peacefully in a lush green meadow with yellow flowers.",
+        "thumbnail_url": "/uploads/wild-goat-grazing/wild-goat-grazing-thumbnail.jpg",
+    }
 ]
 
 with Session(engine) as session:

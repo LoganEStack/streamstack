@@ -8,4 +8,10 @@ export default defineConfig({
     react(),
     babel({ presets: [reactCompilerPreset()] })
   ],
+  server: {
+    proxy: {
+      '/uploads': 'http://localhost:8000',
+      '/api': 'http://localhost:8000',
+    }
+  }
 })
