@@ -1,10 +1,10 @@
-from app.config import RENDITION_LADDER, UPLOADS_ROOT
-from fastapi import APIRouter, HTTPException, Depends
-from fastapi.responses import FileResponse
-from pathlib import Path
-from sqlmodel import Session, select
+from app.config import RENDITION_LADDER, UPLOADS_DIR
 from app.database import get_session
 from app.models import Video
+from pathlib import Path
+from fastapi import APIRouter, HTTPException, Depends
+from fastapi.responses import FileResponse
+from sqlmodel import Session, select
 
 router = APIRouter(prefix="/media", tags=["media"])
 
@@ -40,9 +40,9 @@ def resolve_media_slug(public_id: str, session: Session) -> str:
 def resolve_safe_path(media_slug: str, relative_path: str) -> Path:
     '''Resolves the safe path for the given media slug and relative path.'''
 
-    file_path = UPLOADS_ROOT / media_slug / relative_path
+    file_path = UPLOADS_DIR / media_slug / relative_path
     try:
-        file_path.resolve().relative_to(UPLOADS_ROOT.resolve())
+        file_path.resolve().relative_to(UPLOADS_DIR.resolve())
     except ValueError:
         raise HTTPException(status_code=403, detail="Invalid path")
     return file_path

@@ -1,40 +1,26 @@
 # Stream Stack
 
-A small video streaming app that displays adaptive bitrate streaming: transcoding, HLS packaging, and serving video.
+A small streaming app that serves videos using FFmpeg and the HLS protocol.
 
 
 ## What it does
 
-- **Browse** a small curated catalog of pre-loaded videos, each served as a
-  proper 4-rendition HLS stream (1080p / 720p / 480p / 360p).
-- **Watch** any catalog video with a real adaptive-bitrate player (HLS.js),
+- Watch any catalog video with a real adaptive-bitrate player (HLS.js),
   including a live rendition meter showing which quality is currently
   playing, manual quality override, and a segment-level "stream inspector"
   panel that shows exactly which `.ts` file is playing, how long is left in
   it, and the raw master manifest on request.
-- **Upload** your own video file with no account required. It runs through
-  the same FFmpeg pipeline used to build the catalog, transcodes in the
-  background, and is served back ephemerally — reachable only via its own
-   link, and deleted after a short TTL.
+- Upload your own video file. It runs through the same FFmpeg pipeline 
+  used to build the catalog, transcodes in the background, and is served back 
+  with a 4 stage rendition ladder.
 
 
 ## Why it's built this way
 
-A few decisions here are deliberate trade-offs, not oversights. Worth
-understanding the reasoning, since these are the things worth talking about
-in an interview:
+A few decisions here are deliberate trade-offs, not oversights.
 
 **No user accounts / auth system.**
-Early on this project had JWT auth and a per-user watchlist. Both were cut.
-Auth-plus-CRUD is the most common backend portfolio pattern that exists —
-building it here would have signaled generic backend competency, not
-video-engineering competency. It also didn't actually solve the problem it
-looked like it solved: anyone can register for a free account, so "gate
-uploads behind auth" doesn't stop abuse unless registration itself is
-locked down too. The catalog is public and curated (a handful of
-admin-seeded videos); uploads are public but self-contained, size-limited,
-and ephemeral — access control comes from possessing an unguessable token,
-not from a login.
+
 
 **Token-based access instead of accounts.**
 Every catalog video has a `public_id` — a random opaque identifier
@@ -80,78 +66,33 @@ master manifest from four separately-encoded renditions (see `docs/phase2`
 notes below) specifically to understand what the automated tooling is
 actually doing under the hood before leaning on it.
 
-**Generated thumbnails, not real ones.**
-`Video.thumbnail_url` exists as a field, but nothing currently populates it
-with a real image — there's no frame-extraction step. The frontend
-generates a deterministic placeholder (a title-derived color and waveform
-shape) instead of pointing at a broken image path. Real thumbnails would
-mean pulling a frame via FFmpeg at transcode time — a legitimate follow-up,
-noted in Roadmap.
-
-
 ## Architecture
 
 ```
-┌────────────────┐       ┌──────────────────┐        ┌─────────────────┐
-│    Browser     │──────▶│ FastAPI (8000)    │──────▶│   SQLite          │
-│ React + HLS.js │       │  browse/video/media │       │  video, upload_job │
-└────────────────┘       │  upload/jobs        │        └─────────────────┘
-                         └────────┬───────────┘
-                                 │ BackgroundTasks
-                                 ▼
-                        ┌──────────────────┐
-                        │   FFmpeg (subprocess) │
-                        │  -var_stream_map      │
-                        └────────┬───────────┘
-                                 ▼
-                        ┌──────────────────┐
-                        │  HLS output on disk   │
-                        │  master.m3u8 + renditions │
-                        └──────────────────┘
-```
-
-### Backend (`backend/`)
-
-```
-backend/
-├── app/
-│   ├── main.py            # app entrypoint, CORS, router registration
-│   ├── database.py        # SQLModel engine/session setup
-│   ├── config.py          # upload limits, rendition ladder, paths
-│   ├── models/
-│   │   ├── video.py        # Video, VideoPublic, public_id generation
-│   │   └── upload_job.py   # UploadJob, JobStatus, upload_token generation
-│   ├── browse.py           # GET /browse — catalog listing
-│   ├── video_detail.py     # GET /v/{public_id} — single video metadata
-│   ├── media.py             # GET /media/{public_id}/... — serves catalog HLS
-│   ├── uploads.py           # POST /upload, GET /jobs/{token}, serves ephemeral HLS
-│   └── transcode.py         # builds and runs the FFmpeg command
-├── seed.py                  # seeds the catalog with sample videos
-└── requirements.txt
-```
-
-### Frontend (`frontend/`)
-
-```
-frontend/
-├── src/
-│   ├── api.js                    # all backend calls in one place
-│   ├── components/
-│   │   ├── Nav.jsx
-│   │   ├── VideoCard.jsx
-│   │   ├── Thumbnail.jsx          # generated placeholder art
-│   │   ├── RenditionMeter.jsx     # level-meter UI, doubles as quality selector
-│   │   ├── StreamInspector.jsx    # live segment feed + manifest viewer
-│   │   ├── Skeleton.jsx
-│   │   └── ErrorPanel.jsx
-│   └── pages/
-│       ├── BrowsePage.jsx
-│       ├── WatchPage.jsx
-│       └── UploadPage.jsx
+┌────────────────┐        ┌─────────────────────┐        ┌────────────────────┐
+│    Browser     │──────▶│  FastAPI (8000)      │──────▶│       SQLite       │
+│ React + HLS.js │        │  browse/video/media │        │  video, upload_job │
+└────────────────┘        │  upload/jobs        │        └────────────────────┘
+                          └────────┬────────────┘
+                                   │ BackgroundTasks
+                                   ▼
+                          ┌───────────────────────┐
+                          │   FFmpeg (subprocess) │
+                          │  -var_stream_map      │
+                          └────────┬──────────────┘
+                                   │
+                                   ▼
+                          ┌───────────────────────────┐
+                          │    HLS output on disk     │
+                          │  master.m3u8 + renditions │
+                          └───────────────────────────┘
 ```
 
 
 ## API reference
+
+Interactive docs are available at `/docs` (FastAPI's auto-generated Swagger UI)
+whenever the backend is running.
 
 | Method | Path | Description |
 |---|---|---|
@@ -163,9 +104,6 @@ frontend/
 | `GET`  | `/jobs/{upload_token}` | Poll job status: `pending → processing → ready \| failed` |
 | `GET`  | `/uploads/{upload_token}/master.m3u8` | Master manifest for an ephemeral upload |
 | `GET`  | `/uploads/{upload_token}/{rendition}/{file}` | Ephemeral rendition manifest or segment |
-
-Interactive docs are available at `/docs` (FastAPI's auto-generated Swagger UI)
-whenever the backend is running.
 
 
 ## Setup
@@ -238,22 +176,3 @@ Runs on `http://localhost:5173` (Vite's default).
 - No rate limiting on the upload endpoint — an acceptable scope cut for a
   single-operator demo project, not for production.
 
-
-## Background
-
-This project was built in phases as a self-directed path into video
-streaming engineering:
-
-1. **Domain concepts** — codecs vs. containers, HLS mechanics, adaptive
-   bitrate streaming, CDN behavior, DRM basics, QoE metrics.
-2. **FFmpeg fluency** — manually produced a 4-rendition HLS ladder from a
-   source file, hand-wrote a `master.m3u8`, and served it locally to
-   understand exactly what the automated tooling in Phase 3 does under the
-   hood.
-3. **Backend** (this repo) — FastAPI serving HLS content with correct MIME
-   types and cache headers, a SQLite-backed catalog, and an on-demand
-   upload-and-transcode pipeline with background job processing.
-4. **Frontend** (this repo) — a React app for browsing, watching, and
-   uploading, with a signal-instrument visual identity that reflects the
-   subject matter rather than a generic streaming-app look.
-5. **Polish and deployment** — in progress.

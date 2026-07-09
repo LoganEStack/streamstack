@@ -2,12 +2,12 @@ from pathlib import Path
 
 
 BACKEND_DIR = Path(__file__).resolve().parent.parent
-PROJECT_ROOT = BACKEND_DIR.parent
+BASE_DIR = BACKEND_DIR.parent
 
 DATABASE_URL = f"sqlite:///{BACKEND_DIR / 'streamstack.db'}"
 
-UPLOADS_ROOT = PROJECT_ROOT / "uploads"
-UPLOADS_ROOT.mkdir(exist_ok=True)
+UPLOADS_DIR = BASE_DIR / "uploads"
+UPLOADS_DIR.mkdir(exist_ok=True)
 
 MAX_UPLOAD_SIZE_BYTES = 200 * 1024 * 1024  # 200 MB
 ALLOWED_UPLOAD_EXTENSIONS = {".mp4", ".mov", ".mkv"}

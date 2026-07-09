@@ -5,7 +5,7 @@ from pathlib import Path
 from datetime import datetime, timezone
 from sqlmodel import Session, select
 from app.database import get_session, engine
-from app.config import UPLOADS_ROOT, MAX_UPLOAD_SIZE_BYTES, ALLOWED_UPLOAD_EXTENSIONS, JOB_TTL_MINUTES
+from app.config import UPLOADS_DIR, MAX_UPLOAD_SIZE_BYTES, ALLOWED_UPLOAD_EXTENSIONS, JOB_TTL_MINUTES
 from app.models import UploadJob, UploadJobPublic, JobStatus, generate_unique_upload_token
 from app.transcode import run_transcode_job
 
@@ -22,7 +22,7 @@ def _is_expired(job: UploadJob) -> bool:
 
 
 def _delete_job_files(upload_token: str):
-    job_dir = UPLOADS_ROOT / upload_token
+    job_dir = UPLOADS_DIR / upload_token
     if job_dir.exists():
         shutil.rmtree(job_dir, ignore_errors=True)
 
@@ -42,9 +42,9 @@ def _resolve_ready_job(upload_token: str, session: Session) -> UploadJob:
 
 
 def _safe_upload_path(upload_token: str, relative_path: str) -> Path:
-    file_path = UPLOADS_ROOT / upload_token / relative_path
+    file_path = UPLOADS_DIR / upload_token / relative_path
     try:
-        file_path.resolve().relative_to(UPLOADS_ROOT.resolve())
+        file_path.resolve().relative_to(UPLOADS_DIR.resolve())
     except ValueError:
         raise HTTPException(status_code=403, detail="Invalid path")
     return file_path
@@ -61,7 +61,7 @@ async def upload_video(
         raise HTTPException(status_code=400, detail=f"Unsupported file type: {ext}")
 
     upload_token = generate_unique_upload_token(session)
-    job_dir = UPLOADS_ROOT / upload_token
+    job_dir = UPLOADS_DIR / upload_token
     job_dir.mkdir(parents=True, exist_ok=True)
     source_path = job_dir / f"source{ext}"
 

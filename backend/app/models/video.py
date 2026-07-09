@@ -1,6 +1,6 @@
+import secrets
 from sqlmodel import SQLModel, Field, Session, select
 from typing import Optional
-import secrets
 
 
 class Video(SQLModel, table=True):
@@ -20,6 +20,8 @@ class VideoPublic(SQLModel):
 
 
 def generate_unique_public_id(session: Session) -> str:
+    '''Generates a unique video public id token.'''
+    
     while True:
         candidate = secrets.token_urlsafe(8)
         exists = session.exec(
